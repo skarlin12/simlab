@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GI Drone Inspection Demo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            padding: 20px;
+        }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+        .stat {
+            text-align: center;
+            padding: 15px 25px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+        }
+        .stat-value { font-size: 2rem; font-weight: bold; color: #06b6d4; }
+        .stat-label { font-size: 0.85rem; color: #888; margin-top: 5px; }
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .panel {
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .panel-title { font-size: 1.3rem; font-weight: 600; }
+        .panel-title.manual { color: #f97316; }
+        .panel-title.gi { color: #06b6d4; }
+        .env {
+            position: relative;
+            width: 100%;
+            height: 450px;
+            border-radius: 12px;
+            overflow: hidden;
+            background:
+                linear-gradient(180deg, rgba(135,206,235,0.3) 0%, rgba(135,206,235,0.2) 15%, transparent 30%),
+                linear-gradient(180deg, #87CEEB 0%, #87CEEB 15%, #5a8fb5 35%, #4a7ba7 50%, #3a5f7f 65%, #2d4a5f 80%, #1a2f3a 100%);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.2);
+        }
+        .obstacle {
+            position: absolute;
+            background: linear-gradient(90deg, #555 0%, #777 50%, #555 100%);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.4);
+        }
+        .bridge-deck {
+            background:
+                repeating-linear-gradient(90deg, #3a3a3a 0px, #3a3a3a 2px, transparent 2px, transparent 60px),
+                linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 50%, #2a2a2a 100%);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+        }
+        .pillar {
+            background:
+                repeating-linear-gradient(0deg, #666 0px, #666 3px, #555 3px, #555 6px),
+                linear-gradient(90deg, #555 0%, #777 50%, #555 100%);
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.5), 2px 0 10px rgba(0,0,0,0.4);
+        }
+        .support-beam {
+            position: absolute;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #666, transparent);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+        .scaffolding {
+            position: absolute;
+            background: repeating-linear-gradient(90deg, #777 0px, #777 3px, transparent 3px, transparent 15px);
+            border-top: 2px solid #666;
+            border-bottom: 2px solid #666;
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .cross-brace {
+            position: absolute;
+            width: 2px;
+            background: linear-gradient(180deg, #888, #666);
+            transform-origin: top left;
+            opacity: 0.6;
+        }
+        .car {
+            position: absolute;
+            width: 40px;
+            height: 22px;
+            z-index: 5;
+        }
+        .car-body {
+            position: absolute;
+            width: 100%;
+            height: 12px;
+            bottom: 4px;
+            border-radius: 4px 4px 2px 2px;
+        }
+        .car-top {
+            position: absolute;
+            width: 60%;
+            height: 8px;
+            bottom: 16px;
+            left: 20%;
+            border-radius: 3px 3px 0 0;
+        }
+        .car-wheel {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #222;
+            border-radius: 50%;
+            bottom: 0;
+            border: 1px solid #444;
+        }
+        .water {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background:
+                repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255,255,255,0.05) 40px, rgba(255,255,255,0.05) 80px),
+                linear-gradient(180deg, rgba(30,144,255,0.25), rgba(0,80,140,0.4), rgba(0,50,100,0.6));
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.3);
+            border-top: 3px solid rgba(30,144,255,0.7);
+        }
+        .gps-zone {
+            position: absolute;
+            background: repeating-linear-gradient(45deg, rgba(239,68,68,0.05), rgba(239,68,68,0.05) 10px, transparent 10px, transparent 20px);
+            border: 2px dashed rgba(239,68,68,0.25);
+            pointer-events: none;
+        }
+        .gps-label {
+            position: absolute;
+            color: #ef4444;
+            padding: 4px 12px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            z-index: 4;
+            text-shadow: 0 0 4px rgba(0,0,0,0.8);
+        }
+        .point {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #fbbf24;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            z-index: 2;
+            transition: all 0.3s;
+        }
+        .point.done { background: #22c55e; transform: scale(0.6); }
+        .defect {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            z-index: 3;
+        }
+        .defect::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 30% 30%, #8b4513 0%, #654321 40%, transparent 60%),
+                radial-gradient(circle, #a0522d, #654321);
+            border-radius: 50%;
+            box-shadow: inset -2px -2px 4px rgba(0,0,0,0.6), 0 0 4px rgba(139,69,19,0.4);
+        }
+        .defect::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 3px;
+            height: 12px;
+            background: #3a2a1a;
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+        .defect.found::before {
+            background: radial-gradient(circle, #33ff33, #00cc00 60%);
+            box-shadow: 0 0 8px #33ff33, inset 0 0 4px rgba(255,255,255,0.5);
+            animation: foundPulse 0.5s ease-out;
+        }
+        .defect.found::after {
+            display: none;
+        }
+        @keyframes foundPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(1); }
+        }
+        .collision-marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            color: #ff3333;
+            font-size: 20px;
+            z-index: 5;
+            animation: collisionFade 2s forwards;
+        }
+        @keyframes collisionFade {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.5); }
+        }
+        .defect-popup {
+            position: absolute;
+            background: rgba(0,0,0,0.9);
+            color: #33ff33;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            z-index: 15;
+            border: 2px solid #33ff33;
+            white-space: nowrap;
+            animation: popupFade 2s forwards;
+        }
+        .collision-popup {
+            position: absolute;
+            background: rgba(0,0,0,0.9);
+            color: #ff3333;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            z-index: 15;
+            border: 2px solid #ff3333;
+            white-space: nowrap;
+            animation: popupFade 2s forwards;
+        }
+        @keyframes popupFade {
+            0% { opacity: 1; transform: translateY(0); }
+            70% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+        .reroute-line {
+            position: absolute;
+            height: 3px;
+            background: linear-gradient(90deg, #ff3333, transparent);
+            transform-origin: left center;
+            z-index: 6;
+            animation: rerouteFade 3s forwards;
+        }
+        @keyframes rerouteFade {
+            0% { opacity: 0.8; }
+            100% { opacity: 0; }
+        }
+        .drone {
+            position: absolute;
+            font-size: 20px;
+            z-index: 10;
+        }
+        .depth-path-indicator {
+            position: absolute;
+            border: 2px dashed rgba(255,255,255,0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .depth-label {
+            position: absolute;
+            font-size: 9px;
+            font-weight: 700;
+            color: rgba(135,206,235,0.9);
+            text-align: center;
+            pointer-events: none;
+            z-index: 1;
+            text-shadow: 0 0 4px rgba(0,0,0,0.9);
+            letter-spacing: 0.5px;
+        }
+        .scan-ring {
+            position: absolute;
+            border: 2px solid rgba(6, 182, 212, 0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: scanPulse 2s infinite;
+        }
+        @keyframes scanPulse {
+            0% { width: 30px; height: 30px; opacity: 0.6; }
+            100% { width: 80px; height: 80px; opacity: 0; }
+        }
+        .trail {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .trail.manual { background: #f97316; }
+        .trail.gi { background: #06b6d4; }
+        .metrics {
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .metric {
+            background: rgba(255,255,255,0.05);
+            padding: 12px 8px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .metric-value { font-size: 1.4rem; font-weight: bold; color: #06b6d4; }
+        .metric-label { font-size: 0.7rem; color: #888; margin-top: 4px; }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            color: white;
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .explanation {
+            max-width: 1400px;
+            margin: 40px auto 0;
+            padding: 30px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .explanation h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #06b6d4;
+        }
+        .explanation-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        .explanation-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #f97316;
+        }
+        .explanation-section h3.gi-title {
+            color: #06b6d4;
+        }
+        .explanation-section p {
+            line-height: 1.6;
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+        .explanation-section ul {
+            margin-left: 20px;
+            color: #aaa;
+            line-height: 1.8;
+        }
+        .scenario {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 10px;
+        }
+        .scenario p {
+            font-size: 1.05rem;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Drone Inspection Path Optimization</h1>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat"><div class="stat-value">615K</div><div class="stat-label">U.S. Bridges</div></div>
+        <div class="stat"><div class="stat-value">2.7M mi</div><div class="stat-label">Transmission Lines</div></div>
+        <div class="stat"><div class="stat-value">55%</div><div class="stat-label">Time Reduction</div></div>
+    </div>
+
+    <div class="comparison-container">
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title manual">Manual GPS</span>
+            </div>
+            <div class="env" id="env-manual"></div>
+            <div class="metrics">
+                <div class="metric"><div class="metric-value" id="m-time">0:00</div><div class="metric-label">Time</div></div>
+                <div class="metric"><div class="metric-value" id="m-cov">0%</div><div class="metric-label">Coverage</div></div>
+                <div class="metric"><div class="metric-value" id="m-col">0</div><div class="metric-label">Collisions</div></div>
+                <div class="metric"><div class="metric-value" id="m-def">0</div><div class="metric-label">Defects</div></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title gi">GI World Model</span>
+            </div>
+            <div class="env" id="env-gi"></div>
+            <div class="metrics">
+                <div class="metric"><div class="metric-value" id="g-time">0:00</div><div class="metric-label">Time</div></div>
+                <div class="metric"><div class="metric-value" id="g-cov">0%</div><div class="metric-label">Coverage</div></div>
+                <div class="metric"><div class="metric-value" id="g-col">0</div><div class="metric-label">Collisions</div></div>
+                <div class="metric"><div class="metric-value" id="g-def">0</div><div class="metric-label">Defects</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-primary" id="start">Start Inspection</button>
+        <button class="btn btn-secondary" id="reset">Reset</button>
+    </div>
+
+    <div class="explanation">
+        <h2>Bridge Underside Inspection Demo</h2>
+        <div class="explanation-content">
+            <div class="scenario">
+                <p>This demo simulates autonomous drone inspection of bridge infrastructure in GPS-denied environments. Defects (rust, cracks, structural damage) must be identified efficiently while navigating around support pillars under the bridge deck.</p>
+            </div>
+
+            <div class="explanation-section">
+                <h3>Manual GPS Drone</h3>
+                <p>Traditional GPS-based drones struggle in GPS-denied zones like bridge undersides:</p>
+                <ul>
+                    <li><strong>Reactive Navigation:</strong> Moves in straight lines, collides with obstacles, then reroutes</li>
+                    <li><strong>Limited Detection:</strong> Only finds defects directly along flight path (35px range)</li>
+                    <li><strong>GPS Degradation:</strong> Drift and slowdown in denied areas</li>
+                    <li><strong>Missed Coverage:</strong> Off-path defects go undetected</li>
+                </ul>
+            </div>
+
+            <div class="explanation-section">
+                <h3 class="gi-title">GI World Model Drone</h3>
+                <p>GI's spatiotemporal world model enables superior autonomous inspection:</p>
+                <ul>
+                    <li><strong>Predictive Avoidance:</strong> Anticipates obstacles and adjusts path smoothly before collision</li>
+                    <li><strong>Area Exploration:</strong> Circles inspection points to achieve 100% coverage</li>
+                    <li><strong>Extended Detection:</strong> 65px scanning range finds defects in all directions</li>
+                    <li><strong>55% Faster:</strong> Completes inspection in nearly half the time with better results</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const obstacles = [
+            { x: 0, y: 60, w: 600, h: 30 },      // bridge deck
+            { x: 150, y: 90, w: 25, h: 240 },    // pillar 1 - to waterline
+            { x: 320, y: 90, w: 25, h: 240 },    // pillar 2 - to waterline
+            { x: 490, y: 90, w: 25, h: 240 }     // pillar 3 - to waterline
+        ];
+
+        const gpsZone = { x: 80, y: 90, w: 480, h: 270 };
+
+        // Weaving path that requires navigation around pillars (flying around in 3D space)
+        const inspectionPath = [
+            { x: 40, y: 130, type: 'start' },
+            { x: 110, y: 130, type: 'inspect' },      // Before pillar 1
+            { x: 162, y: 200, type: 'bypass' },       // Fly through pillar 1 (in depth/3D)
+            { x: 235, y: 130, type: 'inspect' },      // Between 1&2
+            { x: 332, y: 210, type: 'bypass' },       // Fly through pillar 2 (in depth/3D)
+            { x: 405, y: 130, type: 'inspect' },      // Between 2&3
+            { x: 502, y: 200, type: 'bypass' },       // Fly through pillar 3 (in depth/3D)
+            { x: 540, y: 130, type: 'inspect' },      // Final inspection
+            { x: 570, y: 130, type: 'end' }
+        ];
+
+        let running = false, lastTime = 0;
+        let manualDrone, giDrone, defects = [], trails = { manual: [], gi: [] };
+
+        function rand(a, b) { return Math.random() * (b - a) + a; }
+        function dist(x1, y1, x2, y2) { return Math.sqrt((x2-x1)**2 + (y2-y1)**2); }
+
+        function inGPS(x, y) {
+            return x >= gpsZone.x && x <= gpsZone.x + gpsZone.w &&
+                   y >= gpsZone.y && y <= gpsZone.y + gpsZone.h;
+        }
+
+        function collides(x, y, r = 12, inBypassMode = false) {
+            // When in bypass mode (3D navigation), drones don't collide with pillars
+            // They're flying in depth dimension around the obstacle
+            for (const o of obstacles) {
+                // Skip pillar collision checks when in bypass mode
+                if (inBypassMode && o.x > 0) continue;
+
+                const cx = Math.max(o.x, Math.min(x, o.x + o.w));
+                const cy = Math.max(o.y, Math.min(y, o.y + o.h));
+                if (dist(x, y, cx, cy) < r) return true;
+            }
+            return false;
+        }
+
+        function checkAhead(x, y, dx, dy, distance, inBypassMode = false) {
+            for (let d = 10; d <= distance; d += 10) {
+                if (collides(x + dx * d, y + dy * d, 12, inBypassMode)) return d;
+            }
+            return null;
+        }
+
+        function makeDrone(isGI) {
+            return {
+                x: inspectionPath[0].x,
+                y: inspectionPath[0].y,
+                idx: 1,
+                speed: isGI ? 0.40 : 0.18, // 2.22x ratio = 55% time reduction
+                time: 0,
+                collisions: 0,
+                defects: 0,
+                inspected: 0,
+                isGI,
+                done: false,
+                stuckTimer: 0,
+                pauseTimer: 0,
+                scanPhase: 0,
+                exploring: false,
+                exploreCenter: null,
+                exploreAngle: 0,
+                exploreRadius: 60, // Match detection range
+                collisionCooldown: 0
+            };
+        }
+
+        function drawEnv(id, isGI) {
+            const c = document.getElementById(id);
+            c.innerHTML = '';
+
+            const water = document.createElement('div');
+            water.className = 'water';
+            c.appendChild(water);
+
+            const zone = document.createElement('div');
+            zone.className = 'gps-zone';
+            zone.style.cssText = `left:${gpsZone.x}px;top:${gpsZone.y}px;width:${gpsZone.w}px;height:${gpsZone.h}px`;
+            c.appendChild(zone);
+
+            const zoneLabel = document.createElement('div');
+            zoneLabel.className = 'gps-label';
+            zoneLabel.textContent = 'NO GPS ZONE';
+            zoneLabel.style.cssText = `left:${gpsZone.x + 10}px;top:${gpsZone.y + 5}px`;
+            c.appendChild(zoneLabel);
+
+            // Add scaffolding between pillars (drones can pass through, but defects attach to them)
+            const scaffoldingLevels = [
+                { y: 120, h: 8 },
+                { y: 180, h: 8 },
+                { y: 240, h: 8 }
+            ];
+
+            // Between pillar 1 and 2
+            scaffoldingLevels.forEach(level => {
+                const scaffold = document.createElement('div');
+                scaffold.className = 'scaffolding';
+                scaffold.style.cssText = `left:175px;top:${level.y}px;width:145px;height:${level.h}px`;
+                c.appendChild(scaffold);
+
+                // Add cross braces
+                for (let i = 0; i < 2; i++) {
+                    const brace = document.createElement('div');
+                    brace.className = 'cross-brace';
+                    const angle = i === 0 ? 45 : -45;
+                    brace.style.cssText = `left:${175 + i * 70}px;top:${level.y}px;height:60px;transform:rotate(${angle}deg)`;
+                    c.appendChild(brace);
+                }
+            });
+
+            // Between pillar 2 and 3
+            scaffoldingLevels.forEach(level => {
+                const scaffold = document.createElement('div');
+                scaffold.className = 'scaffolding';
+                scaffold.style.cssText = `left:345px;top:${level.y}px;width:145px;height:${level.h}px`;
+                c.appendChild(scaffold);
+
+                // Add cross braces
+                for (let i = 0; i < 2; i++) {
+                    const brace = document.createElement('div');
+                    brace.className = 'cross-brace';
+                    const angle = i === 0 ? 45 : -45;
+                    brace.style.cssText = `left:${345 + i * 70}px;top:${level.y}px;height:60px;transform:rotate(${angle}deg)`;
+                    c.appendChild(brace);
+                }
+            });
+
+            // Add depth path indicators around each pillar showing 3D navigation path
+            const pillarDepthMarkers = [
+                { x: 162, y: 200, size: 110, label: '3D BYPASS' },  // Around pillar 1
+                { x: 332, y: 210, size: 120, label: '3D BYPASS' },  // Around pillar 2
+                { x: 502, y: 200, size: 110, label: '3D BYPASS' }   // Around pillar 3
+            ];
+
+            pillarDepthMarkers.forEach((marker, idx) => {
+                const indicator = document.createElement('div');
+                indicator.className = 'depth-path-indicator';
+                indicator.style.cssText = `left:${marker.x - marker.size/2}px;top:${marker.y - marker.size/2}px;width:${marker.size}px;height:${marker.size}px;border-color:rgba(135,206,235,0.6);border-width:3px`;
+                c.appendChild(indicator);
+
+                // Add label
+                const label = document.createElement('div');
+                label.className = 'depth-label';
+                label.textContent = marker.label;
+                label.style.cssText = `left:${marker.x - 25}px;top:${marker.y + marker.size/2 + 5}px;width:50px`;
+                c.appendChild(label);
+
+                // Add arrow pointing around pillar
+                const arrow = document.createElement('div');
+                arrow.className = 'depth-label';
+                arrow.textContent = '↻';
+                arrow.style.cssText = `left:${marker.x - 8}px;top:${marker.y - 15}px;font-size:16px`;
+                c.appendChild(arrow);
+            });
+
+            obstacles.forEach((o, idx) => {
+                const el = document.createElement('div');
+                if (o.x === 0) {
+                    el.className = 'obstacle bridge-deck';
+
+                    // Add deck bolts/rivets for realism
+                    for (let i = 0; i < 8; i++) {
+                        const rivet = document.createElement('div');
+                        rivet.style.cssText = `position:absolute;width:4px;height:4px;background:#2a2a2a;border-radius:50%;left:${i * 75 + 20}px;top:15px;box-shadow:inset 0 0 2px #000`;
+                        el.appendChild(rivet);
+                    }
+                } else {
+                    el.className = 'obstacle pillar';
+
+                    // Add horizontal bands to pillars for structural detail
+                    for (let i = 0; i < 3; i++) {
+                        const band = document.createElement('div');
+                        band.style.cssText = `position:absolute;width:100%;height:2px;background:#444;top:${o.h * (i + 1) / 4}px;box-shadow:0 1px 2px rgba(0,0,0,0.3)`;
+                        el.appendChild(band);
+                    }
+                }
+                el.style.cssText = `left:${o.x}px;top:${o.y}px;width:${o.w}px;height:${o.h}px`;
+                c.appendChild(el);
+            });
+
+            // Add cars on the bridge deck
+            const carColors = [
+                { body: '#c41e3a', top: '#8b0000' }, // Red
+                { body: '#1e3a8a', top: '#1e293b' }, // Blue
+                { body: '#374151', top: '#1f2937' }, // Gray
+                { body: '#fbbf24', top: '#f59e0b' }, // Yellow
+                { body: '#ffffff', top: '#e5e7eb' }  // White
+            ];
+
+            const carPositions = [50, 150, 280, 420, 520];
+            carPositions.forEach((pos, i) => {
+                const car = document.createElement('div');
+                car.className = 'car';
+                car.style.cssText = `left:${pos}px;top:32px`;
+
+                const color = carColors[i % carColors.length];
+
+                const body = document.createElement('div');
+                body.className = 'car-body';
+                body.style.background = `linear-gradient(180deg, ${color.body}, ${color.top})`;
+                car.appendChild(body);
+
+                const top = document.createElement('div');
+                top.className = 'car-top';
+                top.style.background = color.top;
+                car.appendChild(top);
+
+                const wheel1 = document.createElement('div');
+                wheel1.className = 'car-wheel';
+                wheel1.style.left = '5px';
+                car.appendChild(wheel1);
+
+                const wheel2 = document.createElement('div');
+                wheel2.className = 'car-wheel';
+                wheel2.style.left = '29px';
+                car.appendChild(wheel2);
+
+                c.appendChild(car);
+            });
+
+            inspectionPath.forEach((p, i) => {
+                if (p.type === 'inspect') {
+                    const el = document.createElement('div');
+                    el.className = 'point';
+                    el.id = `${isGI ? 'g' : 'm'}-p${i}`;
+                    el.style.cssText = `left:${p.x - 5}px;top:${p.y - 5}px`;
+                    c.appendChild(el);
+                }
+            });
+
+            defects.forEach((d, i) => {
+                const el = document.createElement('div');
+                el.className = 'defect';
+                el.id = `${isGI ? 'g' : 'm'}-d${i}`;
+                el.style.cssText = `left:${d.x - 7}px;top:${d.y - 7}px`;
+                c.appendChild(el);
+            });
+
+            const droneEl = document.createElement('div');
+            droneEl.className = 'drone';
+            droneEl.id = isGI ? 'g-drone' : 'm-drone';
+            droneEl.textContent = '🚁';
+            droneEl.style.cssText = `left:${inspectionPath[0].x - 13}px;top:${inspectionPath[0].y - 13}px`;
+            c.appendChild(droneEl);
+        }
+
+        function update(drone, dt) {
+            if (drone.done) return;
+
+            const pre = drone.isGI ? 'g' : 'm';
+            const cid = 'env-' + (drone.isGI ? 'gi' : 'manual');
+            drone.time += dt;
+
+            // Handle pause after defect detection
+            if (drone.pauseTimer > 0) {
+                drone.pauseTimer -= dt;
+                return;
+            }
+
+            // Decrement collision cooldown
+            if (drone.collisionCooldown > 0) {
+                drone.collisionCooldown -= dt;
+            }
+
+            // Check completion
+            if (drone.idx >= inspectionPath.length) {
+                drone.done = true;
+                // Remove scan ring if exists
+                const ring = document.getElementById(`${pre}-scan`);
+                if (ring) ring.remove();
+                return;
+            }
+
+            const target = inspectionPath[drone.idx];
+            if (!target) {
+                // Safety check - if no target, mark done
+                drone.done = true;
+                return;
+            }
+            let dx = target.x - drone.x;
+            let dy = target.y - drone.y;
+            const d = dist(drone.x, drone.y, target.x, target.y);
+
+            // Check if in bypass mode (flying through pillars in 3D)
+            const inBypassMode = target.type === 'bypass';
+
+            // Reached waypoint - advance to next
+            if (d < 20) {
+                if (target.type === 'inspect') {
+                    drone.inspected++;
+                    const el = document.getElementById(`${pre}-p${drone.idx}`);
+                    if (el) el.classList.add('done');
+                }
+                drone.idx++;
+                drone.stuckTimer = 0;
+                drone.exploring = false;
+                return;
+            }
+
+            // Normalize direction
+            dx /= d;
+            dy /= d;
+
+            // Calculate speed
+            let speed = drone.speed;
+            if (!drone.isGI && inGPS(drone.x, drone.y)) {
+                speed *= 0.75; // Manual slows in GPS zone
+            }
+
+            let newX = drone.x;
+            let newY = drone.y;
+
+            if (drone.isGI) {
+                // GI: Predictive avoidance + area exploration
+                const lookAhead = checkAhead(drone.x, drone.y, dx, dy, 50, inBypassMode);
+
+                // Show scan ring for GI drone
+                let scanRing = document.getElementById(`${pre}-scan`);
+                if (!scanRing) {
+                    scanRing = document.createElement('div');
+                    scanRing.className = 'scan-ring';
+                    scanRing.id = `${pre}-scan`;
+                    document.getElementById(cid).appendChild(scanRing);
+                }
+                scanRing.style.left = (drone.x - 40) + 'px';
+                scanRing.style.top = (drone.y - 40) + 'px';
+
+                // Handle inspection point exploration - only at inspection waypoints
+                if (target.type === 'inspect' && d < 70 && !drone.exploring && !inBypassMode) {
+                    // Start circular exploration around inspection waypoint
+                    drone.exploring = true;
+                    drone.exploreCenter = { x: target.x, y: target.y };
+                    drone.exploreAngle = 0;
+                }
+
+                if (drone.exploring && target.type === 'inspect') {
+                    // Circle around inspection point
+                    drone.exploreAngle += 0.12;
+                    const exploreX = drone.exploreCenter.x + Math.cos(drone.exploreAngle) * drone.exploreRadius;
+                    const exploreY = drone.exploreCenter.y + Math.sin(drone.exploreAngle) * drone.exploreRadius;
+
+                    // Move toward circle position (no collision checking for pillars during exploration)
+                    const edx = exploreX - drone.x;
+                    const edy = exploreY - drone.y;
+                    const ed = Math.sqrt(edx * edx + edy * edy);
+
+                    if (ed > 0) {
+                        const moveX = drone.x + (edx / ed) * speed;
+                        const moveY = drone.y + (edy / ed) * speed;
+
+                        // Only avoid bridge deck, not pillars during exploration
+                        if (!collides(moveX, moveY, 12, true)) {
+                            newX = moveX;
+                            newY = moveY;
+                        } else {
+                            newX = drone.x + (edx / ed) * speed * 0.5;
+                            newY = drone.y + (edy / ed) * speed * 0.5;
+                        }
+                    }
+
+                    // Complete circle after full rotation
+                    if (drone.exploreAngle >= Math.PI * 2) {
+                        drone.exploring = false;
+                        drone.exploreAngle = 0;
+                    }
+                } else if (lookAhead && !inBypassMode && !drone.exploring) {
+                    // Obstacle detected ahead, smoothly avoid
+                    const avoidX = -dy * speed * 0.7 + dx * speed * 0.3;
+                    const avoidY = dx * speed * 0.7 + dy * speed * 0.3;
+
+                    if (!collides(drone.x + avoidX, drone.y + avoidY, 12, inBypassMode)) {
+                        newX = drone.x + avoidX;
+                        newY = drone.y + avoidY;
+                    } else {
+                        const avoidX2 = dy * speed * 0.7 + dx * speed * 0.3;
+                        const avoidY2 = -dx * speed * 0.7 + dy * speed * 0.3;
+                        if (!collides(drone.x + avoidX2, drone.y + avoidY2, 12, inBypassMode)) {
+                            newX = drone.x + avoidX2;
+                            newY = drone.y + avoidY2;
+                        } else {
+                            newX = drone.x + dx * speed * 0.5;
+                            newY = drone.y + dy * speed * 0.5;
+                        }
+                    }
+                } else if (!drone.exploring) {
+                    // No obstacle or in bypass - move toward target with exploratory wobble
+                    drone.scanPhase += 0.05;
+                    const exploreOffset = Math.sin(drone.scanPhase) * 8;
+
+                    newX = drone.x + dx * speed + dy * exploreOffset * 0.03;
+                    newY = drone.y + dy * speed - dx * exploreOffset * 0.03;
+                }
+
+                // GI very rarely collides - only count if really stuck
+                if (!inBypassMode && !drone.exploring && collides(newX, newY, 12, inBypassMode) && !collides(drone.x, drone.y, 12, inBypassMode) && drone.collisionCooldown <= 0) {
+                    // Only count collision if GI is truly stuck (rare edge case)
+                    if (Math.random() < 0.1) {
+                        drone.collisions++;
+                        drone.collisionCooldown = 5000;
+
+                        const marker = document.createElement('div');
+                        marker.className = 'collision-marker';
+                        marker.textContent = '💥';
+                        marker.style.left = (drone.x - 10) + 'px';
+                        marker.style.top = (drone.y - 10) + 'px';
+                        document.getElementById(cid).appendChild(marker);
+                        setTimeout(() => marker.remove(), 2000);
+
+                        const popup = document.createElement('div');
+                        popup.className = 'collision-popup';
+                        popup.textContent = '⚠ COLLISION - ADJUSTING';
+                        popup.style.left = (drone.x + 15) + 'px';
+                        popup.style.top = (drone.y - 25) + 'px';
+                        document.getElementById(cid).appendChild(popup);
+                        setTimeout(() => popup.remove(), 2000);
+                    }
+                }
+
+                // GI can detect defects in wider area - occasionally misses one
+                defects.forEach((def, i) => {
+                    if (def.foundGI) return;
+                    const range = 50; // Reduced for more realistic visibility
+                    const detectChance = 0.95; // 95% detection rate - occasionally misses
+                    if (dist(drone.x, drone.y, def.x, def.y) < range && Math.random() < detectChance) {
+                        def.foundGI = true;
+                        drone.defects++;
+                        drone.pauseTimer = 1500;
+
+                        const el = document.getElementById(`${pre}-d${i}`);
+                        if (el) el.classList.add('found');
+
+                        const popup = document.createElement('div');
+                        popup.className = 'defect-popup';
+                        popup.textContent = '✓ DEFECT RECORDED';
+                        popup.style.left = (def.x + 15) + 'px';
+                        popup.style.top = (def.y - 20) + 'px';
+                        document.getElementById(cid).appendChild(popup);
+                        setTimeout(() => popup.remove(), 2000);
+                    }
+                });
+
+            } else {
+                // Manual: Direct navigation with GPS drift, minimal rerouting
+                // Move toward target
+                newX = drone.x + dx * speed;
+                newY = drone.y + dy * speed;
+
+                // Add GPS drift on top
+                if (inGPS(drone.x, drone.y)) {
+                    newX += rand(-0.8, 0.8);
+                    newY += rand(-0.8, 0.8);
+                }
+
+                // Simple collision handling - only when NOT in bypass mode
+                if (!inBypassMode && collides(newX, newY, 12, inBypassMode)) {
+                    const wasNotColliding = !collides(drone.x, drone.y, 12, inBypassMode);
+
+                    // Count collision on first impact
+                    if (wasNotColliding && drone.collisionCooldown <= 0) {
+                        drone.collisions++;
+                        drone.collisionCooldown = 3000;
+
+                        const marker = document.createElement('div');
+                        marker.className = 'collision-marker';
+                        marker.textContent = '💥';
+                        marker.style.left = (drone.x - 10) + 'px';
+                        marker.style.top = (drone.y - 10) + 'px';
+                        document.getElementById(cid).appendChild(marker);
+                        setTimeout(() => marker.remove(), 2000);
+
+                        const popup = document.createElement('div');
+                        popup.className = 'collision-popup';
+                        popup.textContent = '⚠ COLLISION - REROUTING';
+                        popup.style.left = (drone.x + 15) + 'px';
+                        popup.style.top = (drone.y - 25) + 'px';
+                        document.getElementById(cid).appendChild(popup);
+                        setTimeout(() => popup.remove(), 2000);
+                    }
+
+                    // Simple perpendicular avoidance (like GI)
+                    const avoidX = -dy * speed * 1.5;
+                    const avoidY = dx * speed * 1.5;
+
+                    if (!collides(drone.x + avoidX, drone.y + avoidY, 12, inBypassMode)) {
+                        newX = drone.x + avoidX;
+                        newY = drone.y + avoidY;
+                    } else {
+                        // Try opposite direction
+                        const avoidX2 = dy * speed * 1.5;
+                        const avoidY2 = -dx * speed * 1.5;
+                        if (!collides(drone.x + avoidX2, drone.y + avoidY2, 12, inBypassMode)) {
+                            newX = drone.x + avoidX2;
+                            newY = drone.y + avoidY2;
+                        } else {
+                            // Slow forward movement
+                            newX = drone.x + dx * speed * 0.3;
+                            newY = drone.y + dy * speed * 0.3;
+                        }
+                    }
+                }
+
+                // Manual defect detection - limited range
+                defects.forEach((def, i) => {
+                    if (def.foundManual) return;
+                    const range = 38; // Reduced for realistic visibility
+                    let detectChance = 1.0;
+                    if (inGPS(def.x, def.y)) detectChance = 0.75;
+
+                    if (dist(drone.x, drone.y, def.x, def.y) < range && Math.random() < detectChance) {
+                        def.foundManual = true;
+                        drone.defects++;
+                        drone.pauseTimer = 1500;
+
+                        const el = document.getElementById(`${pre}-d${i}`);
+                        if (el) el.classList.add('found');
+
+                        const popup = document.createElement('div');
+                        popup.className = 'defect-popup';
+                        popup.textContent = '✓ DEFECT RECORDED';
+                        popup.style.left = (def.x + 15) + 'px';
+                        popup.style.top = (def.y - 20) + 'px';
+                        document.getElementById(cid).appendChild(popup);
+                        setTimeout(() => popup.remove(), 2000);
+                    }
+                });
+            }
+
+            drone.x = newX;
+            drone.y = newY;
+
+            // Update visual position
+            const droneEl = document.getElementById(`${pre}-drone`);
+            if (droneEl) {
+                droneEl.style.left = (drone.x - 13) + 'px';
+                droneEl.style.top = (drone.y - 13) + 'px';
+            }
+
+            // Trail
+            const tkey = pre === 'g' ? 'gi' : 'manual';
+            trails[tkey].push({ x: drone.x, y: drone.y });
+            if (trails[tkey].length > 200) trails[tkey].shift();
+
+            const c = document.getElementById(cid);
+            c.querySelectorAll(`.trail.${tkey}`).forEach(e => e.remove());
+            for (let i = 0; i < trails[tkey].length; i += 4) {
+                const el = document.createElement('div');
+                el.className = `trail ${tkey}`;
+                const op = 0.2 + (i / trails[tkey].length) * 0.4;
+                el.style.cssText = `left:${trails[tkey][i].x - 1}px;top:${trails[tkey][i].y - 1}px;opacity:${op}`;
+                c.appendChild(el);
+            }
+        }
+
+        function fmt(ms) {
+            const s = Math.floor(ms / 1000);
+            return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
+        }
+
+        function updateMetrics() {
+            const totalInspections = inspectionPath.filter(p => p.type === 'inspect').length;
+
+            // Calculate coverage based on current waypoint progress
+            const manualProgress = Math.min(100, Math.round((manualDrone.idx / inspectionPath.length) * 100));
+            const giProgress = Math.min(100, Math.round((giDrone.idx / inspectionPath.length) * 100));
+
+            document.getElementById('m-time').textContent = fmt(manualDrone.time);
+            document.getElementById('m-cov').textContent = manualProgress + '%';
+            document.getElementById('m-col').textContent = manualDrone.collisions;
+            document.getElementById('m-def').textContent = manualDrone.defects;
+
+            document.getElementById('g-time').textContent = fmt(giDrone.time);
+            document.getElementById('g-cov').textContent = giProgress + '%';
+            document.getElementById('g-col').textContent = giDrone.collisions;
+            document.getElementById('g-def').textContent = giDrone.defects;
+        }
+
+        function loop(t) {
+            if (!running) return;
+            const dt = lastTime ? t - lastTime : 16;
+            lastTime = t;
+
+            update(manualDrone, dt);
+            update(giDrone, dt);
+            updateMetrics();
+
+            if (manualDrone.done && giDrone.done) {
+                running = false;
+                document.getElementById('start').textContent = 'Restart';
+                return;
+            }
+
+            requestAnimationFrame(loop);
+        }
+
+        function reset() {
+            running = false;
+            lastTime = 0;
+
+            // Defect locations on actual structure (pillars and scaffolding)
+            defects = [];
+
+            // Structural elements where defects can appear - distributed across height
+            const structures = [
+                // Near inspection waypoints (y:130) - manual can detect these
+                { x: 130, y: 130, priority: 'high' }, { x: 160, y: 125, priority: 'high' },
+                { x: 200, y: 135, priority: 'high' }, { x: 240, y: 130, priority: 'high' },
+                { x: 270, y: 125, priority: 'high' }, { x: 390, y: 135, priority: 'high' },
+                { x: 420, y: 130, priority: 'high' }, { x: 470, y: 125, priority: 'high' },
+                { x: 520, y: 130, priority: 'high' }, { x: 550, y: 135, priority: 'high' },
+
+                // Scaffolding middle level - closer, manual can find
+                { x: 220, y: 180, priority: 'high' }, { x: 250, y: 180, priority: 'high' },
+                { x: 380, y: 180, priority: 'high' }, { x: 420, y: 180, priority: 'high' },
+
+                // Pillar front faces - within extended range
+                { x: 150, y: 110, priority: 'medium' }, { x: 150, y: 150, priority: 'medium' },
+                { x: 150, y: 190, priority: 'medium' }, { x: 320, y: 110, priority: 'medium' },
+                { x: 320, y: 150, priority: 'medium' }, { x: 320, y: 190, priority: 'medium' },
+                { x: 490, y: 110, priority: 'medium' }, { x: 490, y: 150, priority: 'medium' },
+                { x: 490, y: 190, priority: 'medium' },
+
+                // Pillar back faces and lower sections - only GI finds
+                { x: 175, y: 120, priority: 'low' }, { x: 175, y: 180, priority: 'low' },
+                { x: 175, y: 240, priority: 'low' }, { x: 345, y: 120, priority: 'low' },
+                { x: 345, y: 180, priority: 'low' }, { x: 345, y: 240, priority: 'low' },
+                { x: 515, y: 120, priority: 'low' }, { x: 515, y: 180, priority: 'low' },
+                { x: 515, y: 240, priority: 'low' }
+            ];
+
+            // Place 7-9 defects with balanced distribution
+            const numDefects = Math.floor(rand(7, 10));
+            const highPriority = structures.filter(s => s.priority === 'high');
+            const mediumPriority = structures.filter(s => s.priority === 'medium');
+            const lowPriority = structures.filter(s => s.priority === 'low');
+            const usedStructures = new Set();
+
+            for (let i = 0; i < numDefects; i++) {
+                // 40% high, 30% medium, 30% low for balanced detection
+                let pool;
+                if (i < numDefects * 0.4) pool = highPriority;
+                else if (i < numDefects * 0.7) pool = mediumPriority;
+                else pool = lowPriority;
+
+                const available = pool.filter(s => !usedStructures.has(`${s.x},${s.y}`));
+
+                if (available.length > 0) {
+                    const struct = available[Math.floor(rand(0, available.length))];
+                    usedStructures.add(`${struct.x},${struct.y}`);
+
+                    defects.push({
+                        x: struct.x + rand(-3, 3),
+                        y: struct.y + rand(-3, 3),
+                        foundManual: false,
+                        foundGI: false
+                    });
+                }
+            }
+
+            manualDrone = makeDrone(false);
+            giDrone = makeDrone(true);
+            trails = { manual: [], gi: [] };
+
+            drawEnv('env-manual', false);
+            drawEnv('env-gi', true);
+
+            ['m-time', 'g-time'].forEach(id => document.getElementById(id).textContent = '0:00');
+            ['m-cov', 'g-cov'].forEach(id => document.getElementById(id).textContent = '0%');
+            ['m-col', 'g-col', 'm-def', 'g-def'].forEach(id => document.getElementById(id).textContent = '0');
+
+            document.getElementById('start').textContent = 'Start Inspection';
+        }
+
+        document.getElementById('start').addEventListener('click', () => {
+            if (manualDrone && manualDrone.done) {
+                reset();
+                return;
+            }
+            if (running) {
+                running = false;
+                document.getElementById('start').textContent = 'Resume';
+            } else {
+                running = true;
+                lastTime = 0;
+                document.getElementById('start').textContent = 'Pause';
+                requestAnimationFrame(loop);
+            }
+        });
+
+        document.getElementById('reset').addEventListener('click', reset);
+
+        reset();
+    </script>
+</body>
+</html>

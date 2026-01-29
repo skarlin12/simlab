@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GI Robotic Arm Exception Handling Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header p {
+            color: #888;
+            font-size: 1.1rem;
+        }
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .stat {
+            text-align: center;
+            padding: 15px 25px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #a855f7;
+        }
+        .stat-label {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 5px;
+        }
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .simulation-panel {
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .panel-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        .panel-title.fixed { color: #f87171; }
+        .panel-title.gi-enabled { color: #a855f7; }
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge.fixed { background: rgba(248,113,113,0.2); color: #f87171; }
+        .badge.adaptive { background: rgba(168,85,247,0.2); color: #a855f7; }
+        .workspace {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16162a 100%);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .conveyor {
+            position: absolute;
+            bottom: 60px;
+            left: 20px;
+            right: 20px;
+            height: 40px;
+            background: repeating-linear-gradient(
+                90deg,
+                #374151 0px,
+                #374151 20px,
+                #4b5563 20px,
+                #4b5563 40px
+            );
+            border-radius: 4px;
+            animation: conveyorMove 2s linear infinite;
+        }
+        @keyframes conveyorMove {
+            from { background-position: 0 0; }
+            to { background-position: 40px 0; }
+        }
+        .bin {
+            position: absolute;
+            bottom: 110px;
+            width: 200px;
+            height: 150px;
+            background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+            border: 3px solid #374151;
+            border-radius: 8px;
+        }
+        .bin.source { left: 50px; }
+        .bin.target { right: 50px; }
+        .bin-label {
+            position: absolute;
+            bottom: -25px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #888;
+        }
+        .robot-arm {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .arm-base {
+            width: 60px;
+            height: 30px;
+            background: linear-gradient(180deg, #6b7280 0%, #4b5563 100%);
+            border-radius: 4px;
+            margin: 0 auto;
+        }
+        .arm-segment {
+            position: absolute;
+            width: 20px;
+            background: linear-gradient(90deg, #9ca3af 0%, #6b7280 50%, #9ca3af 100%);
+            border-radius: 4px;
+            transform-origin: bottom center;
+            transition: transform 0.3s ease-out;
+        }
+        .arm-segment.lower {
+            height: 100px;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) rotate(0deg);
+        }
+        .arm-segment.upper {
+            height: 80px;
+            bottom: 130px;
+            left: 50%;
+            transform: translateX(-50%) rotate(0deg);
+        }
+        .gripper {
+            position: absolute;
+            width: 40px;
+            height: 30px;
+            bottom: 210px;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: all 0.3s ease-out;
+        }
+        .gripper-finger {
+            position: absolute;
+            width: 8px;
+            height: 20px;
+            background: #9ca3af;
+            border-radius: 2px;
+            transition: all 0.2s;
+        }
+        .gripper-finger.left { left: 5px; }
+        .gripper-finger.right { right: 5px; }
+        .gripper.closed .gripper-finger.left { left: 12px; }
+        .gripper.closed .gripper-finger.right { right: 12px; }
+        .object {
+            position: absolute;
+            border-radius: 4px;
+            transition: all 0.3s ease-out;
+        }
+        .object.box {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+        .object.cylinder {
+            width: 25px;
+            height: 35px;
+            background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+            border-radius: 50% 50% 4px 4px;
+        }
+        .object.irregular {
+            width: 35px;
+            height: 28px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border-radius: 8px 4px 12px 2px;
+        }
+        .object.tilted {
+            transform: rotate(25deg);
+        }
+        .object.stacked {
+            z-index: 5;
+        }
+        .prediction-overlay {
+            position: absolute;
+            border: 2px dashed #a855f7;
+            background: rgba(168, 85, 247, 0.1);
+            border-radius: 4px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .prediction-overlay.visible {
+            opacity: 1;
+        }
+        .status-message {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            z-index: 100;
+        }
+        .status-message.error {
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+        }
+        .status-message.success {
+            background: rgba(34, 197, 94, 0.9);
+            color: white;
+        }
+        .status-message.thinking {
+            background: rgba(168, 85, 247, 0.9);
+            color: white;
+        }
+        .metrics-panel {
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .metric {
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+        .metric-value.good { color: #22c55e; }
+        .metric-value.bad { color: #ef4444; }
+        .metric-value.neutral { color: #a855f7; }
+        .metric-label {
+            font-size: 0.7rem;
+            color: #888;
+            margin-top: 4px;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(168, 85, 247, 0.3);
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .difficulty-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .difficulty-btn {
+            padding: 10px 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .difficulty-btn.active {
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            border-color: transparent;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: #888;
+        }
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+        .story-box {
+            max-width: 800px;
+            margin: 40px auto 0;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .story-box h3 {
+            color: #a855f7;
+            margin-bottom: 10px;
+        }
+        .story-box p {
+            color: #aaa;
+            line-height: 1.6;
+        }
+        .exception-indicator {
+            position: absolute;
+            top: 50px;
+            right: 10px;
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 8px;
+            font-size: 0.75rem;
+        }
+        .exception-type {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Robotic Arm Exception Handling</h1>
+        <p>Fixed programming vs. GI-enabled adaptive manipulation with inverse dynamics</p>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-value">$10K</div>
+            <div class="stat-label">Downtime Cost/Min</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">10-20%</div>
+            <div class="stat-label">Exception Rate</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">65%</div>
+            <div class="stat-label">Hardware Failures</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">$50K</div>
+            <div class="stat-label">Reprogram Cost</div>
+        </div>
+    </div>
+
+    <div class="difficulty-selector">
+        <button class="difficulty-btn active" data-difficulty="easy">📦 Standard Objects</button>
+        <button class="difficulty-btn" data-difficulty="medium">🔄 Tilted Objects</button>
+        <button class="difficulty-btn" data-difficulty="hard">🎲 Cluttered Bin</button>
+    </div>
+
+    <div class="comparison-container">
+        <div class="simulation-panel">
+            <div class="panel-header">
+                <span class="panel-title fixed">Fixed Programming</span>
+                <span class="badge fixed">Pre-defined Paths</span>
+            </div>
+            <div class="workspace" id="workspace-fixed">
+                <div class="exception-indicator" id="fixed-exception">
+                    Current: <span class="exception-type">None</span>
+                </div>
+            </div>
+            <div class="metrics-panel">
+                <div class="metric">
+                    <div class="metric-value bad" id="fixed-success">0</div>
+                    <div class="metric-label">Successful Picks</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value bad" id="fixed-failures">0</div>
+                    <div class="metric-label">Failures</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value bad" id="fixed-rate">0%</div>
+                    <div class="metric-label">Success Rate</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value bad" id="fixed-interventions">0</div>
+                    <div class="metric-label">Human Interventions</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="simulation-panel">
+            <div class="panel-header">
+                <span class="panel-title gi-enabled">GI Inverse Dynamics</span>
+                <span class="badge adaptive">Real-time Adaptation</span>
+            </div>
+            <div class="workspace" id="workspace-gi">
+                <div class="exception-indicator" id="gi-exception">
+                    Current: <span class="exception-type">Analyzing...</span>
+                </div>
+            </div>
+            <div class="metrics-panel">
+                <div class="metric">
+                    <div class="metric-value good" id="gi-success">0</div>
+                    <div class="metric-label">Successful Picks</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value good" id="gi-failures">0</div>
+                    <div class="metric-label">Failures</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value good" id="gi-rate">0%</div>
+                    <div class="metric-label">Success Rate</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value neutral" id="gi-adaptations">0</div>
+                    <div class="metric-label">Adaptations Made</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-primary" id="startBtn">Start Picking Cycle</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);"></div>
+            <span>Box</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #22c55e 0%, #15803d 100%); border-radius: 50% 50% 2px 2px;"></div>
+            <span>Cylinder</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 4px 2px 6px 1px;"></div>
+            <span>Irregular Shape</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: rgba(168, 85, 247, 0.3); border: 2px dashed #a855f7;"></div>
+            <span>GI Prediction</span>
+        </div>
+    </div>
+
+    <div class="story-box">
+        <h3>What This Demo Shows</h3>
+        <p>
+            <strong>Fixed programming</strong> relies on pre-defined pick points. When objects are tilted, overlapping,
+            or in unexpected positions, the arm either misses the grasp or triggers an exception requiring human intervention.
+            This causes 10-20% of picks to fail, with each failure costing thousands in downtime.
+            <br><br>
+            <strong>GI's inverse dynamics</strong> predicts object pose and adapts grasp strategy in real-time.
+            The world model reasons about contact physics and gripper dynamics, achieving successful picks even in
+            the "unstructured 20%" that causes most production downtime.
+        </p>
+    </div>
+
+    <script>
+        let difficulty = 'easy';
+        let running = false;
+        let animationId = null;
+        let currentCycle = 0;
+        const maxCycles = 10;
+
+        let metrics = {
+            fixed: { success: 0, failures: 0, interventions: 0 },
+            gi: { success: 0, failures: 0, adaptations: 0 }
+        };
+
+        const objectTypes = ['box', 'cylinder', 'irregular'];
+
+        function generateObjects(diff) {
+            const objects = [];
+            const count = diff === 'hard' ? 6 : diff === 'medium' ? 4 : 3;
+
+            for (let i = 0; i < count; i++) {
+                const type = objectTypes[Math.floor(Math.random() * objectTypes.length)];
+                const baseX = 70 + (i % 3) * 50;
+                const baseY = 150 + Math.floor(i / 3) * 40;
+
+                objects.push({
+                    type,
+                    x: baseX + (Math.random() - 0.5) * 20,
+                    y: baseY + (Math.random() - 0.5) * 15,
+                    rotation: diff !== 'easy' ? (Math.random() - 0.5) * 50 : 0,
+                    picked: false,
+                    exception: null
+                });
+            }
+
+            // Add specific exceptions based on difficulty
+            if (diff === 'medium' || diff === 'hard') {
+                objects[0].rotation = 35; // Tilted
+                objects[0].exception = 'tilted';
+            }
+            if (diff === 'hard') {
+                objects[1].x = objects[2].x - 10; // Overlapping
+                objects[1].y = objects[2].y - 5;
+                objects[1].exception = 'overlapping';
+                objects[3].rotation = -40;
+                objects[3].exception = 'occluded';
+            }
+
+            return objects;
+        }
+
+        function initWorkspace(containerId, isGI) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            // Exception indicator
+            const exceptionDiv = document.createElement('div');
+            exceptionDiv.className = 'exception-indicator';
+            exceptionDiv.id = isGI ? 'gi-exception' : 'fixed-exception';
+            exceptionDiv.innerHTML = 'Current: <span class="exception-type">Ready</span>';
+            container.appendChild(exceptionDiv);
+
+            // Source bin
+            const sourceBin = document.createElement('div');
+            sourceBin.className = 'bin source';
+            sourceBin.innerHTML = '<div class="bin-label">Source Bin</div>';
+            container.appendChild(sourceBin);
+
+            // Target bin
+            const targetBin = document.createElement('div');
+            targetBin.className = 'bin target';
+            targetBin.innerHTML = '<div class="bin-label">Target Bin</div>';
+            container.appendChild(targetBin);
+
+            // Conveyor
+            const conveyor = document.createElement('div');
+            conveyor.className = 'conveyor';
+            container.appendChild(conveyor);
+
+            // Robot arm (simplified visual)
+            const armContainer = document.createElement('div');
+            armContainer.className = 'robot-arm';
+            armContainer.id = isGI ? 'gi-arm' : 'fixed-arm';
+            armContainer.innerHTML = `
+                <div class="arm-base"></div>
+                <div class="arm-segment lower" id="${isGI ? 'gi' : 'fixed'}-lower"></div>
+                <div class="arm-segment upper" id="${isGI ? 'gi' : 'fixed'}-upper"></div>
+                <div class="gripper" id="${isGI ? 'gi' : 'fixed'}-gripper">
+                    <div class="gripper-finger left"></div>
+                    <div class="gripper-finger right"></div>
+                </div>
+            `;
+            container.appendChild(armContainer);
+
+            // GI prediction overlay
+            if (isGI) {
+                const prediction = document.createElement('div');
+                prediction.className = 'prediction-overlay';
+                prediction.id = 'gi-prediction';
+                container.appendChild(prediction);
+            }
+        }
+
+        let fixedObjects = [];
+        let giObjects = [];
+        let currentPickIndex = 0;
+        let pickPhase = 'idle'; // idle, reaching, grasping, lifting, placing, returning
+        let phaseTimer = 0;
+
+        function resetSimulation() {
+            running = false;
+            if (animationId) cancelAnimationFrame(animationId);
+
+            metrics = {
+                fixed: { success: 0, failures: 0, interventions: 0 },
+                gi: { success: 0, failures: 0, adaptations: 0 }
+            };
+
+            currentCycle = 0;
+            currentPickIndex = 0;
+            pickPhase = 'idle';
+            phaseTimer = 0;
+
+            fixedObjects = generateObjects(difficulty);
+            giObjects = JSON.parse(JSON.stringify(fixedObjects)); // Deep copy
+
+            initWorkspace('workspace-fixed', false);
+            initWorkspace('workspace-gi', true);
+
+            renderObjects('workspace-fixed', fixedObjects);
+            renderObjects('workspace-gi', giObjects);
+
+            updateMetricsDisplay();
+            document.getElementById('startBtn').textContent = 'Start Picking Cycle';
+        }
+
+        function renderObjects(containerId, objects) {
+            const container = document.getElementById(containerId);
+
+            // Remove existing objects
+            container.querySelectorAll('.object').forEach(el => el.remove());
+
+            objects.forEach((obj, i) => {
+                if (obj.picked) return;
+
+                const el = document.createElement('div');
+                el.className = `object ${obj.type}`;
+                el.id = `${containerId}-obj-${i}`;
+                el.style.left = obj.x + 'px';
+                el.style.top = obj.y + 'px';
+                el.style.transform = `rotate(${obj.rotation}deg)`;
+                container.appendChild(el);
+            });
+        }
+
+        function updateSimulation() {
+            if (!running) return;
+
+            phaseTimer++;
+
+            // Find next object to pick
+            const fixedTarget = fixedObjects.find(o => !o.picked);
+            const giTarget = giObjects.find(o => !o.picked);
+
+            if (!fixedTarget && !giTarget) {
+                running = false;
+                document.getElementById('startBtn').textContent = 'Cycle Complete';
+                return;
+            }
+
+            // Update both arms
+            if (fixedTarget) updateArm('fixed', fixedTarget, fixedObjects);
+            if (giTarget) updateArm('gi', giTarget, giObjects);
+
+            animationId = requestAnimationFrame(updateSimulation);
+        }
+
+        function updateArm(type, target, objects) {
+            const isGI = type === 'gi';
+            const prefix = type;
+
+            // Simplified arm animation based on phase
+            const phases = ['reaching', 'grasping', 'deciding', 'lifting', 'placing', 'returning'];
+            const phaseLength = isGI ? 40 : 50; // GI is slightly faster
+
+            const currentPhaseIndex = Math.floor(phaseTimer / phaseLength) % 6;
+            const phase = phases[currentPhaseIndex];
+            const phaseProgress = (phaseTimer % phaseLength) / phaseLength;
+
+            // Update exception indicator
+            const exceptionEl = document.getElementById(`${prefix}-exception`);
+            const exceptionType = exceptionEl.querySelector('.exception-type');
+
+            // Get arm elements (simplified - we'll just show status messages)
+            const gripper = document.getElementById(`${prefix}-gripper`);
+
+            if (phase === 'reaching') {
+                exceptionType.textContent = 'Reaching...';
+                if (gripper) gripper.classList.remove('closed');
+            } else if (phase === 'grasping') {
+                exceptionType.textContent = isGI ? 'Analyzing pose...' : 'Grasping...';
+                if (gripper) gripper.classList.add('closed');
+            } else if (phase === 'deciding') {
+                // This is where the magic happens
+                if (target.exception) {
+                    if (isGI) {
+                        // GI adapts
+                        exceptionType.textContent = `Adapting to ${target.exception}`;
+                        exceptionType.style.color = '#a855f7';
+                        metrics.gi.adaptations++;
+
+                        // Show prediction overlay
+                        const prediction = document.getElementById('gi-prediction');
+                        if (prediction) {
+                            prediction.style.left = (target.x - 5) + 'px';
+                            prediction.style.top = (target.y - 5) + 'px';
+                            prediction.style.width = '45px';
+                            prediction.style.height = '40px';
+                            prediction.style.transform = `rotate(${target.rotation}deg)`;
+                            prediction.classList.add('visible');
+                        }
+                    } else {
+                        // Fixed fails on exceptions
+                        if (Math.random() < 0.7) { // 70% failure rate on exceptions
+                            exceptionType.textContent = `FAILED: ${target.exception}`;
+                            exceptionType.style.color = '#ef4444';
+                            showStatusMessage('workspace-fixed', 'Exception! Human intervention required', 'error');
+                            metrics.fixed.failures++;
+                            metrics.fixed.interventions++;
+                            target.picked = true; // Skip this one
+                            updateMetricsDisplay();
+                        }
+                    }
+                } else {
+                    exceptionType.textContent = isGI ? 'Standard pick' : 'Executing...';
+                    exceptionType.style.color = '#888';
+                }
+            } else if (phase === 'lifting') {
+                exceptionType.textContent = 'Lifting...';
+
+                // Hide prediction
+                if (isGI) {
+                    const prediction = document.getElementById('gi-prediction');
+                    if (prediction) prediction.classList.remove('visible');
+                }
+            } else if (phase === 'placing') {
+                exceptionType.textContent = 'Placing...';
+
+                // Mark as picked and count success
+                if (!target.picked) {
+                    target.picked = true;
+                    if (isGI) {
+                        metrics.gi.success++;
+                        showStatusMessage('workspace-gi', 'Pick successful', 'success');
+                    } else {
+                        metrics.fixed.success++;
+                        showStatusMessage('workspace-fixed', 'Pick successful', 'success');
+                    }
+                    renderObjects(isGI ? 'workspace-gi' : 'workspace-fixed', objects);
+                    updateMetricsDisplay();
+                }
+
+                if (gripper) gripper.classList.remove('closed');
+            } else if (phase === 'returning') {
+                exceptionType.textContent = 'Returning...';
+            }
+        }
+
+        function showStatusMessage(containerId, message, type) {
+            const container = document.getElementById(containerId);
+            const existing = container.querySelector('.status-message');
+            if (existing) existing.remove();
+
+            const msg = document.createElement('div');
+            msg.className = `status-message ${type}`;
+            msg.textContent = message;
+            container.appendChild(msg);
+
+            setTimeout(() => msg.remove(), 1500);
+        }
+
+        function updateMetricsDisplay() {
+            const fixedTotal = metrics.fixed.success + metrics.fixed.failures;
+            const giTotal = metrics.gi.success + metrics.gi.failures;
+
+            document.getElementById('fixed-success').textContent = metrics.fixed.success;
+            document.getElementById('fixed-failures').textContent = metrics.fixed.failures;
+            document.getElementById('fixed-rate').textContent =
+                fixedTotal > 0 ? Math.round((metrics.fixed.success / fixedTotal) * 100) + '%' : '0%';
+            document.getElementById('fixed-interventions').textContent = metrics.fixed.interventions;
+
+            document.getElementById('gi-success').textContent = metrics.gi.success;
+            document.getElementById('gi-failures').textContent = metrics.gi.failures;
+            document.getElementById('gi-rate').textContent =
+                giTotal > 0 ? Math.round((metrics.gi.success / giTotal) * 100) + '%' : '0%';
+            document.getElementById('gi-adaptations').textContent = metrics.gi.adaptations;
+        }
+
+        // Event listeners
+        document.getElementById('startBtn').addEventListener('click', () => {
+            if (running) {
+                running = false;
+                document.getElementById('startBtn').textContent = 'Resume';
+            } else {
+                running = true;
+                document.getElementById('startBtn').textContent = 'Pause';
+                updateSimulation();
+            }
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', resetSimulation);
+
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                difficulty = btn.dataset.difficulty;
+                resetSimulation();
+            });
+        });
+
+        // Initialize
+        resetSimulation();
+    </script>
+</body>
+</html>
