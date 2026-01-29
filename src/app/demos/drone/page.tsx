@@ -16,7 +16,7 @@ export default function DroneDemoPage() {
         <div className="container mx-auto px-4">
           <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
             <iframe
-              src="/drone_demo.html"
+              src="/drone_demo"
               className="w-full h-[900px] border-0"
               title="Drone Inspection Demo"
             />
