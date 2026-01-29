@@ -14,13 +14,13 @@ export function Button({
   children,
   ...props
 }: ButtonProps) {
-  const baseStyles = 'inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
+  const baseStyles = 'inline-flex items-center justify-center rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed'
 
   const variants = {
-    primary: 'bg-gradient-to-r from-primary-purple to-primary-cyan text-white hover:opacity-90 shadow-lg hover:shadow-primary-purple/50',
-    secondary: 'bg-primary-magenta text-white hover:opacity-90 shadow-lg hover:shadow-primary-magenta/50',
-    outline: 'border-2 border-primary-purple text-primary-purple hover:bg-primary-purple/10',
-    ghost: 'text-gray-300 hover:text-white hover:bg-white/5',
+    primary: 'bg-white text-black hover:bg-black hover:text-white border-2 border-white transition-all duration-500',
+    secondary: 'bg-[#F2D8CD] text-black hover:bg-black hover:text-[#F2D8CD] border-2 border-[#F2D8CD] transition-all duration-500',
+    outline: 'border-2 border-[#4D4D4D] text-white hover:bg-white hover:text-black transition-all duration-500',
+    ghost: 'text-gray-300 hover:text-[#F2D8CD] hover:bg-white/5 transition-all duration-500',
   }
 
   const sizes = {
@@ -32,6 +32,7 @@ export function Button({
   return (
     <button
       className={cn(baseStyles, variants[variant], sizes[size], className)}
+      style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
       {...props}
     >
       {children}

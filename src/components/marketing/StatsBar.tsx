@@ -5,7 +5,7 @@ const stats = [
   { label: 'Workplace injuries annually', value: '34,900+', color: 'text-status-danger' },
   { label: 'Cost per forklift incident', value: '$48,000+', color: 'text-status-warning' },
   { label: 'Traditional training time', value: '6-12 months', color: 'text-gray-400' },
-  { label: 'GI training time', value: '< 1 hour', color: 'text-status-success' },
+  { label: 'General Intuition training time', value: '< 1 hour', color: 'text-status-success' },
 ]
 
 export function StatsBar() {

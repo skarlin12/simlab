@@ -11,18 +11,24 @@ const config: Config = {
     extend: {
       colors: {
         background: {
-          dark: '#0a0a0f',
-          darker: '#050508',
+          dark: '#000000',
+          darker: '#000000',
         },
         primary: {
-          purple: '#667eea',
-          cyan: '#06b6d4',
-          magenta: '#a855f7',
+          // General Intuition warm beige accent
+          purple: '#F2D8CD',
+          cyan: '#F2D8CD',
+          magenta: '#D4A574',
+          beige: '#F2D8CD',
         },
         status: {
-          success: '#22c55e',
-          danger: '#ef4444',
-          warning: '#fbbf24',
+          success: '#F2D8CD',
+          danger: '#8B7355',
+          warning: '#D4A574',
+        },
+        neutral: {
+          gray: '#888888',
+          'dark-gray': '#4D4D4D',
         },
       },
       backgroundImage: {

@@ -7,13 +7,13 @@ import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Cart
 
 // Mock data for demonstrations
 const performanceData = [
-  { date: 'Jan 20', ruleBase: 87, giEnabled: 96, incidents: 12 },
-  { date: 'Jan 21', ruleBase: 89, giEnabled: 97, incidents: 8 },
-  { date: 'Jan 22', ruleBase: 85, giEnabled: 98, incidents: 6 },
-  { date: 'Jan 23', ruleBase: 88, giEnabled: 97, incidents: 7 },
-  { date: 'Jan 24', ruleBase: 90, giEnabled: 99, incidents: 3 },
-  { date: 'Jan 25', ruleBase: 86, giEnabled: 98, incidents: 5 },
-  { date: 'Jan 26', ruleBase: 91, giEnabled: 99, incidents: 2 },
+  { date: 'Jan 20', ruleBase: 87, generalIntuitionEnabled: 96, incidents: 12 },
+  { date: 'Jan 21', ruleBase: 89, generalIntuitionEnabled: 97, incidents: 8 },
+  { date: 'Jan 22', ruleBase: 85, generalIntuitionEnabled: 98, incidents: 6 },
+  { date: 'Jan 23', ruleBase: 88, generalIntuitionEnabled: 97, incidents: 7 },
+  { date: 'Jan 24', ruleBase: 90, generalIntuitionEnabled: 99, incidents: 3 },
+  { date: 'Jan 25', ruleBase: 86, generalIntuitionEnabled: 98, incidents: 5 },
+  { date: 'Jan 26', ruleBase: 91, generalIntuitionEnabled: 99, incidents: 2 },
 ]
 
 const robotTypeData = [
@@ -24,10 +24,10 @@ const robotTypeData = [
 ]
 
 const incidentTypeData = [
-  { name: 'Near Miss', value: 45, color: '#fbbf24' },
-  { name: 'Collision', value: 12, color: '#ef4444' },
-  { name: 'Path Deviation', value: 28, color: '#a855f7' },
-  { name: 'Timeout', value: 15, color: '#06b6d4' },
+  { name: 'Near Miss', value: 45, color: '#D4A574' },
+  { name: 'Collision', value: 12, color: '#8B7355' },
+  { name: 'Path Deviation', value: 28, color: '#F2D8CD' },
+  { name: 'Timeout', value: 15, color: '#A69080' },
 ]
 
 const recentIncidents = [
@@ -41,65 +41,90 @@ const recentIncidents = [
 export function AnalyticsDashboard() {
   return (
     <div className="space-y-6">
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <div className="text-sm text-gray-400 mb-1">Total Simulations</div>
-          <div className="text-3xl font-bold text-white mb-2">429</div>
-          <Badge variant="success">+12% this week</Badge>
+      {/* Summary Cards - Amplitude style */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="bg-white/[0.02] border-[#4D4D4D]">
+          <div className="flex items-start justify-between mb-3">
+            <div className="text-sm font-medium text-gray-400">Total Simulations</div>
+          </div>
+          <div className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Chakra Petch, monospace' }}>429</div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-[#F2D8CD]">↑ 12%</span>
+            <span className="text-xs text-gray-500">vs last week</span>
+          </div>
         </Card>
 
-        <Card>
-          <div className="text-sm text-gray-400 mb-1">Success Rate</div>
-          <div className="text-3xl font-bold text-primary-cyan mb-2">98.2%</div>
-          <Badge variant="success">+2.1% improvement</Badge>
+        <Card className="bg-white/[0.02] border-[#4D4D4D]">
+          <div className="flex items-start justify-between mb-3">
+            <div className="text-sm font-medium text-gray-400">Success Rate</div>
+          </div>
+          <div className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Chakra Petch, monospace' }}>98.2%</div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-[#F2D8CD]">↑ 2.1%</span>
+            <span className="text-xs text-gray-500">improvement</span>
+          </div>
         </Card>
 
-        <Card>
-          <div className="text-sm text-gray-400 mb-1">Total Incidents</div>
-          <div className="text-3xl font-bold text-status-warning mb-2">100</div>
-          <Badge variant="warning">-8% vs last week</Badge>
+        <Card className="bg-white/[0.02] border-[#4D4D4D]">
+          <div className="flex items-start justify-between mb-3">
+            <div className="text-sm font-medium text-gray-400">Total Incidents</div>
+          </div>
+          <div className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Chakra Petch, monospace' }}>100</div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-[#F2D8CD]">↓ 8%</span>
+            <span className="text-xs text-gray-500">vs last week</span>
+          </div>
         </Card>
 
-        <Card>
-          <div className="text-sm text-gray-400 mb-1">Avg Efficiency</div>
-          <div className="text-3xl font-bold text-primary-purple mb-2">94.7%</div>
-          <Badge variant="info">+3.2% improvement</Badge>
+        <Card className="bg-white/[0.02] border-[#4D4D4D]">
+          <div className="flex items-start justify-between mb-3">
+            <div className="text-sm font-medium text-gray-400">Avg Efficiency</div>
+          </div>
+          <div className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Chakra Petch, monospace' }}>94.7%</div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-[#F2D8CD]">↑ 3.2%</span>
+            <span className="text-xs text-gray-500">improvement</span>
+          </div>
         </Card>
       </div>
 
       {/* Performance Over Time */}
-      <Card>
-        <h3 className="text-xl font-bold text-white mb-6">Success Rate Comparison</h3>
+      <Card className="bg-white/[0.02] border-[#4D4D4D]">
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-white mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+            Success Rate Comparison
+          </h3>
+          <p className="text-sm text-gray-400">Performance trends over the last 7 days</p>
+        </div>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={performanceData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="date" stroke="#9ca3af" />
-            <YAxis stroke="#9ca3af" domain={[80, 100]} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(77,77,77,0.3)" />
+            <XAxis dataKey="date" stroke="#888888" style={{ fontSize: '12px' }} />
+            <YAxis stroke="#888888" domain={[80, 100]} style={{ fontSize: '12px' }} />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'rgba(10, 10, 15, 0.95)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                border: '1px solid #4D4D4D',
                 borderRadius: '8px',
                 color: '#fff',
               }}
             />
-            <Legend />
+            <Legend wrapperStyle={{ fontSize: '14px' }} />
             <Line
               type="monotone"
               dataKey="ruleBase"
-              stroke="#ef4444"
+              stroke="#888888"
               strokeWidth={2}
               name="Rule-Based"
-              dot={{ fill: '#ef4444', r: 4 }}
+              dot={{ fill: '#888888', r: 3 }}
             />
             <Line
               type="monotone"
-              dataKey="giEnabled"
-              stroke="#667eea"
+              dataKey="generalIntuitionEnabled"
+              stroke="#F2D8CD"
               strokeWidth={2}
-              name="GI-Enabled"
-              dot={{ fill: '#667eea', r: 4 }}
+              name="General Intuition-Enabled"
+              dot={{ fill: '#F2D8CD', r: 3 }}
             />
           </LineChart>
         </ResponsiveContainer>
@@ -107,31 +132,41 @@ export function AnalyticsDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Robot Performance by Type */}
-        <Card>
-          <h3 className="text-xl font-bold text-white mb-6">Performance by Robot Type</h3>
+        <Card className="bg-white/[0.02] border-[#4D4D4D]">
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-white mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+              Performance by Robot Type
+            </h3>
+            <p className="text-sm text-gray-400">Simulation counts and success rates</p>
+          </div>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={robotTypeData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-              <XAxis dataKey="name" stroke="#9ca3af" />
-              <YAxis stroke="#9ca3af" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(77,77,77,0.3)" />
+              <XAxis dataKey="name" stroke="#888888" style={{ fontSize: '12px' }} />
+              <YAxis stroke="#888888" style={{ fontSize: '12px' }} />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: 'rgba(10, 10, 15, 0.95)',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                  border: '1px solid #4D4D4D',
                   borderRadius: '8px',
                   color: '#fff',
                 }}
               />
-              <Legend />
-              <Bar dataKey="simulations" fill="#06b6d4" name="Simulations" />
-              <Bar dataKey="avgSuccess" fill="#667eea" name="Avg Success %" />
+              <Legend wrapperStyle={{ fontSize: '14px' }} />
+              <Bar dataKey="simulations" fill="#888888" name="Simulations" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="avgSuccess" fill="#F2D8CD" name="Avg Success %" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </Card>
 
         {/* Incident Distribution */}
-        <Card>
-          <h3 className="text-xl font-bold text-white mb-6">Incident Distribution</h3>
+        <Card className="bg-white/[0.02] border-[#4D4D4D]">
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-white mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+              Incident Distribution
+            </h3>
+            <p className="text-sm text-gray-400">Breakdown by incident type</p>
+          </div>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -150,8 +185,8 @@ export function AnalyticsDashboard() {
               </Pie>
               <Tooltip
                 contentStyle={{
-                  backgroundColor: 'rgba(10, 10, 15, 0.95)',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                  border: '1px solid #4D4D4D',
                   borderRadius: '8px',
                   color: '#fff',
                 }}
@@ -162,42 +197,51 @@ export function AnalyticsDashboard() {
       </div>
 
       {/* Recent Incidents Table */}
-      <Card>
+      <Card className="bg-white/[0.02] border-[#4D4D4D]">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-white">Recent Incidents</h3>
-          <button className="text-sm text-primary-cyan hover:text-primary-purple transition-colors">
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+              Recent Incidents
+            </h3>
+            <p className="text-sm text-gray-400">Latest incident reports from your fleet</p>
+          </div>
+          <button className="text-sm text-[#F2D8CD] hover:text-white transition-colors duration-500"
+            style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+          >
             View All →
           </button>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/10">
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">ID</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">Timestamp</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">Robot</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">Type</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">Severity</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">Details</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">Action</th>
+              <tr className="border-b border-[#4D4D4D]">
+                <th className="text-left py-3 px-4 font-semibold text-gray-400">ID</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-400">Timestamp</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-400">Robot</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-400">Type</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-400">Severity</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-400">Details</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-400">Action</th>
               </tr>
             </thead>
             <tbody>
               {recentIncidents.map((incident) => (
-                <tr key={incident.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                  <td className="py-3 px-4 text-sm text-primary-cyan font-mono">{incident.id}</td>
-                  <td className="py-3 px-4 text-sm text-gray-300">{incident.timestamp}</td>
-                  <td className="py-3 px-4 text-sm text-white font-medium">{incident.robot}</td>
-                  <td className="py-3 px-4 text-sm text-gray-300">{incident.type}</td>
+                <tr key={incident.id} className="border-b border-white/[0.05] hover:bg-white/[0.02] transition-colors">
+                  <td className="py-3 px-4 font-mono text-[#F2D8CD]">{incident.id}</td>
+                  <td className="py-3 px-4 text-gray-300">{incident.timestamp}</td>
+                  <td className="py-3 px-4 text-white font-medium">{incident.robot}</td>
+                  <td className="py-3 px-4 text-gray-300">{incident.type}</td>
                   <td className="py-3 px-4">
                     <Badge variant={incident.severity as any}>
                       {incident.severity}
                     </Badge>
                   </td>
-                  <td className="py-3 px-4 text-sm text-gray-400">{incident.details}</td>
+                  <td className="py-3 px-4 text-gray-400">{incident.details}</td>
                   <td className="py-3 px-4">
-                    <button className="text-sm text-primary-cyan hover:text-primary-purple transition-colors">
+                    <button className="text-[#F2D8CD] hover:text-white transition-colors duration-500"
+                      style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+                    >
                       View Replay
                     </button>
                   </td>
@@ -209,23 +253,23 @@ export function AnalyticsDashboard() {
       </Card>
 
       {/* Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="bg-white/[0.02] border-[#4D4D4D]">
           <div className="text-sm text-gray-400 mb-2">Avg Response Time</div>
-          <div className="text-2xl font-bold text-white">28ms</div>
-          <div className="text-xs text-gray-500 mt-1">Target: &lt;50ms</div>
+          <div className="text-3xl font-bold text-white mb-1" style={{ fontFamily: 'Chakra Petch, monospace' }}>28ms</div>
+          <div className="text-xs text-gray-500">Target: &lt;50ms</div>
         </Card>
 
-        <Card>
+        <Card className="bg-white/[0.02] border-[#4D4D4D]">
           <div className="text-sm text-gray-400 mb-2">Collision Avoidance</div>
-          <div className="text-2xl font-bold text-status-success">99.5%</div>
-          <div className="text-xs text-gray-500 mt-1">vs 95% rule-based</div>
+          <div className="text-3xl font-bold text-white mb-1" style={{ fontFamily: 'Chakra Petch, monospace' }}>99.5%</div>
+          <div className="text-xs text-gray-500">vs 95% rule-based</div>
         </Card>
 
-        <Card>
+        <Card className="bg-white/[0.02] border-[#4D4D4D]">
           <div className="text-sm text-gray-400 mb-2">Uptime</div>
-          <div className="text-2xl font-bold text-primary-cyan">99.97%</div>
-          <div className="text-xs text-gray-500 mt-1">Last 30 days</div>
+          <div className="text-3xl font-bold text-white mb-1" style={{ fontFamily: 'Chakra Petch, monospace' }}>99.97%</div>
+          <div className="text-xs text-gray-500">Last 30 days</div>
         </Card>
       </div>
     </div>

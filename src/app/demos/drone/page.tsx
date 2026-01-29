@@ -27,7 +27,7 @@ export default function DroneDemoPage() {
               <h3 className="text-xl font-bold text-white mb-4">About This Demo</h3>
               <p className="text-gray-300 mb-4">
                 This simulation demonstrates autonomous drone navigation for bridge inspection in GPS-denied
-                environments, comparing traditional and GI-enabled approaches.
+                environments, comparing traditional and General Intuition-enabled approaches.
               </p>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>

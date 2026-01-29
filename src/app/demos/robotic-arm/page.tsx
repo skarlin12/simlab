@@ -27,7 +27,7 @@ export default function RoboticArmDemoPage() {
               <h3 className="text-xl font-bold text-white mb-4">About This Demo</h3>
               <p className="text-gray-300 mb-4">
                 This interactive simulation showcases adaptive robotic arm manipulation, comparing traditional
-                fixed programming with GI-enabled adaptive control for variable objects.
+                fixed programming with General Intuition-enabled adaptive control for variable objects.
               </p>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
@@ -40,7 +40,7 @@ export default function RoboticArmDemoPage() {
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-primary-purple mb-2">GI Adaptive Control</h4>
+                  <h4 className="font-semibold text-primary-purple mb-2">General Intuition Adaptive Control</h4>
                   <ul className="text-sm text-gray-400 space-y-1">
                     <li>• Real-time adaptation</li>
                     <li>• Handles object variability</li>

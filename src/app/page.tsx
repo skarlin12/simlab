@@ -1,17 +1,13 @@
 import { Hero } from '@/components/marketing/Hero'
-import { StatsBar } from '@/components/marketing/StatsBar'
-import { FoundationPolicies } from '@/components/marketing/FoundationPolicies'
-import { UseCases } from '@/components/marketing/UseCases'
+import { Stats } from '@/components/marketing/Stats'
 import { HowItWorks } from '@/components/marketing/HowItWorks'
 
 export default function Home() {
   return (
     <>
       <Hero />
-      <StatsBar />
-      <FoundationPolicies />
+      <Stats />
       <HowItWorks />
-      <UseCases />
     </>
   )
 }

@@ -45,11 +45,11 @@ export function UseCases() {
     <section className="py-20 bg-background-darker">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-white mb-4">
+          <h2 className="text-4xl font-bold text-white mb-4" style={{ fontFamily: 'Georgia, serif' }}>
             Real-World Impact
           </h2>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            See how leading companies are deploying GI policies in production
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto" style={{ fontFamily: 'Inter, sans-serif' }}>
+            See how leading companies are deploying General Intuition policies in production
           </p>
         </div>
 
@@ -64,9 +64,9 @@ export function UseCases() {
                 {useCase.description}
               </p>
 
-              <div className="bg-gradient-to-r from-primary-purple/20 to-primary-cyan/20 rounded-lg p-4 mb-4">
+              <div className="bg-[rgba(242,216,205,0.1)] rounded-lg p-4 mb-4 border border-[#F2D8CD]/20">
                 <div className="text-sm text-gray-400 mb-1">ROI</div>
-                <div className="text-xl font-bold text-primary-cyan">
+                <div className="text-xl font-bold text-[#F2D8CD]" style={{ fontFamily: 'Chakra Petch, monospace' }}>
                   {useCase.roi}
                 </div>
               </div>
@@ -87,14 +87,6 @@ export function UseCases() {
               </Link>
             </Card>
           ))}
-        </div>
-
-        <div className="text-center mt-12">
-          <Link href={ROUTES.USE_CASES}>
-            <Button variant="primary" size="lg">
-              Explore All Use Cases
-            </Button>
-          </Link>
         </div>
       </div>
     </section>

@@ -8,7 +8,7 @@ export default function ForkliftDemoPage() {
     <>
       <PageHeader
         title="Forklift Navigation Demo"
-        description="Compare rule-based vs GI-enabled collision avoidance in warehouse environments"
+        description="Compare rule-based vs General Intuition-enabled collision avoidance in warehouse environments"
         badge="Live Demo"
       />
 
@@ -26,7 +26,7 @@ export default function ForkliftDemoPage() {
             <div className="bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm rounded-xl border border-white/10 p-6">
               <h3 className="text-xl font-bold text-white mb-4">About This Demo</h3>
               <p className="text-gray-300 mb-4">
-                This interactive simulation compares traditional rule-based forklift navigation with GI-enabled
+                This interactive simulation compares traditional rule-based forklift navigation with General Intuition-enabled
                 autonomous navigation in a warehouse environment.
               </p>
               <div className="grid md:grid-cols-2 gap-6">
