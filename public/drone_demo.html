@@ -3,61 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <title>GI Drone Inspection Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --space-sm: 0.75rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+        }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0a0a0f;
+            font-family: "Inter", -apple-system, sans-serif;
+            background: #000000;
             color: #fff;
-            padding: 20px;
+            padding: clamp(28px, 3.5vw, 50px);
         }
         .header { text-align: center; margin-bottom: 30px; }
         .header h1 {
             font-size: 2.5rem;
-            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-family: "Georgia", serif;
+            color: #FFFFFF;
         }
         .stats-bar {
             display: flex;
             justify-content: center;
-            gap: 40px;
+            gap: 24px;
             margin-bottom: 30px;
         }
         .stat {
             text-align: center;
             padding: 15px 25px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 9px;
+            border: 1px solid #4d4d4d;
         }
-        .stat-value { font-size: 2rem; font-weight: bold; color: #06b6d4; }
+        .stat-value { font-size: 2rem; font-weight: bold; font-family: "Chakra Petch", monospace; color: #FFFFFF; }
         .stat-label { font-size: 0.85rem; color: #888; margin-top: 5px; }
         .comparison-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 16px;
             max-width: 1400px;
             margin: 0 auto;
         }
         .panel {
-            background: rgba(255,255,255,0.03);
-            border-radius: 16px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
             padding: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid #4d4d4d;
         }
         .panel-header {
             display: flex;
             justify-content: space-between;
             margin-bottom: 15px;
         }
-        .panel-title { font-size: 1.3rem; font-weight: 600; }
-        .panel-title.manual { color: #f97316; }
-        .panel-title.gi { color: #06b6d4; }
+        .panel-title { font-size: 1.3rem; font-weight: 600; font-family: "Inter", sans-serif; }
+        .panel-title.manual { color: #888888; }
+        .panel-title.gi { color: #FFFFFF; }
         .env {
             position: relative;
             width: 100%;
             height: 450px;
-            border-radius: 12px;
+            border-radius: 9px;
             overflow: hidden;
             background:
                 linear-gradient(180deg, rgba(135,206,235,0.3) 0%, rgba(135,206,235,0.2) 15%, transparent 30%),
@@ -169,7 +178,7 @@
             border-radius: 50%;
             border: 2px solid #fff;
             z-index: 2;
-            transition: all 0.3s;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .point.done { background: #22c55e; transform: scale(0.6); }
         .defect {
@@ -309,8 +318,8 @@
             border-radius: 50%;
             pointer-events: none;
         }
-        .trail.manual { background: #f97316; }
-        .trail.gi { background: #06b6d4; }
+        .trail.manual { background: #888888; }
+        .trail.gi { background: #FFFFFF; }
         .metrics {
             margin-top: 15px;
             display: grid;
@@ -318,12 +327,12 @@
             gap: 10px;
         }
         .metric {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.04);
             padding: 12px 8px;
-            border-radius: 8px;
+            border-radius: 6px;
             text-align: center;
         }
-        .metric-value { font-size: 1.4rem; font-weight: bold; color: #06b6d4; }
+        .metric-value { font-size: 1.4rem; font-weight: bold; font-family: "Chakra Petch", monospace; color: #FFFFFF; }
         .metric-label { font-size: 0.7rem; color: #888; margin-top: 4px; }
         .controls {
             display: flex;
@@ -334,32 +343,40 @@
         .btn {
             padding: 12px 30px;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .btn-primary {
-            background: linear-gradient(135deg, #06b6d4, #3b82f6);
-            color: white;
+            background: #FFFFFF;
+            color: #000000;
+            border: 1px solid #FFFFFF;
+        }
+        .btn-primary:hover {
+            background: #000000;
+            color: #FFFFFF;
+            transform: translateY(-2px);
         }
         .btn-secondary {
             background: rgba(255,255,255,0.1);
             color: white;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid #4d4d4d;
         }
         .explanation {
             max-width: 1400px;
             margin: 40px auto 0;
             padding: 30px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            border: 1px solid #4d4d4d;
         }
         .explanation h2 {
             font-size: 1.5rem;
             margin-bottom: 20px;
-            color: #06b6d4;
+            font-family: "Georgia", serif;
+            color: #FFFFFF;
         }
         .explanation-content {
             display: grid;
@@ -369,10 +386,11 @@
         .explanation-section h3 {
             font-size: 1.1rem;
             margin-bottom: 10px;
-            color: #f97316;
+            font-family: "Inter", sans-serif;
+            color: #888888;
         }
         .explanation-section h3.gi-title {
-            color: #06b6d4;
+            color: #FFFFFF;
         }
         .explanation-section p {
             line-height: 1.6;
