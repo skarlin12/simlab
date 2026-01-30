@@ -1,4 +1,9 @@
 {
   "cleanUrls": false,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/forklift_demo", "destination": "/forklift_demo.html" },
+    { "source": "/drone_demo", "destination": "/drone_demo.html" },
+    { "source": "/robotic_arm_demo", "destination": "/robotic_arm_demo.html" }
+  ]
 }
