@@ -9,6 +9,7 @@ const useCases = [
     title: 'Warehouse Automation',
     description: 'Coordinate 100+ AMRs and forklifts with predictive collision avoidance in dynamic warehouse environments',
     roi: '$10M+ annual savings',
+    videoSrc: '/videos/warehouse-forklift-pov.mp4',
     metrics: [
       { label: 'Safety improvement', value: '95% → 99.5%' },
       { label: 'Throughput increase', value: '+18%' },
@@ -20,6 +21,7 @@ const useCases = [
     title: 'Infrastructure Inspection',
     description: 'Autonomous drone inspection for bridges, power lines, and industrial sites with GPS-denied navigation',
     roi: '30-50% faster inspections',
+    videoSrc: '/videos/drone-inspection-pov.mp4',
     metrics: [
       { label: 'Coverage improvement', value: '+55%' },
       { label: 'Human risk reduction', value: '100%' },
@@ -31,6 +33,7 @@ const useCases = [
     title: 'Adaptive Manufacturing',
     description: 'Robotic arms that handle variable parts without reprogramming, with 98% success on novel orientations',
     roi: '$250K-$1M per line',
+    videoSrc: '/videos/robotic-arm-picking.mp4',
     metrics: [
       { label: 'Success rate', value: '80% → 98%' },
       { label: 'Setup time', value: '-90%' },
@@ -55,36 +58,52 @@ export function UseCases() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {useCases.map((useCase, index) => (
-            <Card key={index} hover className="flex flex-col">
-              <h3 className="text-2xl font-bold text-white mb-3">
-                {useCase.title}
-              </h3>
+            <Card key={index} className="flex flex-col overflow-hidden p-0">
+              {/* Video Container with Overlay */}
+              <div className="relative w-full h-64 overflow-hidden bg-gradient-to-br from-[#2C3E50] to-[#34495E]">
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="absolute inset-0 w-full h-full object-cover"
+                >
+                  <source src={useCase.videoSrc} type="video/mp4" />
+                </video>
 
-              <p className="text-gray-400 mb-4 flex-grow">
-                {useCase.description}
-              </p>
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
 
-              <div className="bg-[rgba(242,216,205,0.1)] rounded-lg p-4 mb-4 border border-[#F2D8CD]/20">
-                <div className="text-sm text-gray-400 mb-1">ROI</div>
-                <div className="text-xl font-bold text-[#F2D8CD]" style={{ fontFamily: 'Chakra Petch, monospace' }}>
-                  {useCase.roi}
+                {/* Title and ROI Overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <h3 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+                    {useCase.title}
+                  </h3>
+                  <div className="inline-block bg-[#F2D8CD] text-[#2C3E50] px-4 py-1.5 rounded-full font-bold text-sm">
+                    {useCase.roi}
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-2 mb-6">
-                {useCase.metrics.map((metric, idx) => (
-                  <div key={idx} className="flex justify-between items-center text-sm">
-                    <span className="text-gray-400">{metric.label}</span>
-                    <span className="font-semibold text-white">{metric.value}</span>
-                  </div>
-                ))}
-              </div>
+              {/* Content Section */}
+              <div className="p-6 flex flex-col flex-grow">
+                <p className="text-gray-400 mb-4 flex-grow">
+                  {useCase.description}
+                </p>
 
-              <Link href={useCase.demoLink} className="mt-auto">
-                <Button variant="outline" className="w-full">
-                  View Demo
-                </Button>
-              </Link>
+                <div className="space-y-2 mb-6">
+                  {useCase.metrics.map((metric, idx) => (
+                    <div key={idx} className="flex justify-between items-center text-sm">
+                      <span className="text-gray-400">{metric.label}</span>
+                      <span className="font-semibold text-white">{metric.value}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <Link href={useCase.demoLink} className="mt-auto text-[#F2D8CD] hover:text-white transition-colors flex items-center justify-center gap-2 text-sm font-medium">
+                  View Interactive Demo →
+                </Link>
+              </div>
             </Card>
           ))}
         </div>

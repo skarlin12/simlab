@@ -16,7 +16,7 @@ export default function ForkliftDemoPage() {
         <div className="container mx-auto px-4">
           <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
             <iframe
-              src="/forklift_demo"
+              src="/forklift_demo.html"
               className="w-full h-[900px] border-0"
               title="Forklift Navigation Demo"
             />

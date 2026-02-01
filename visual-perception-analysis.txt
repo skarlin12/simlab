@@ -1,0 +1,276 @@
+GENERAL INTUITION: VISUAL PERCEPTION SYSTEM REQUIREMENTS ANALYSIS
+================================================================================
+
+EXECUTIVE SUMMARY
+--------------------------------------------------------------------------------
+Approximately 50% of General Intuition's embodied AI use cases (by revenue)
+require visual perception systems (cameras, video feeds, or 3D sensors).
+
+Overall Market Breakdown:
+- Total Addressable Market (TAM): $1.36B
+- Visual Perception-Enabled Market: $681.5M (~50%)
+
+This analysis specifically tracks eligibility based on visual/camera systems,
+as GI's technology requires visual perception data to effectively plug into
+robotic systems.
+
+
+DETAILED BREAKDOWN BY CATEGORY
+================================================================================
+
+1. MOBILE GROUND VEHICLES: ~25% Eligibility ($195M / $770M)
+--------------------------------------------------------------------------------
+
+1.1 Warehouse Forklifts: 7% ($30M / $400M)
+   • Total install base: 16M forklifts globally
+     Source: Market Sizing Math.pdf, Mobile Ground Vehicles section
+
+   • Camera-equipped telematics: 1.1M units eligible
+     Source: "1.4M install base of material handling equipment with telematics,
+     but only 1.1M have camera feeds" (Berg Insight data)
+     Reference: Market Sizing Math.pdf, Warehouse Forklifts subsection
+
+   • Eligibility rate: 7% (1.1M / 16M)
+   • TAM calculation: $400M × 7% = $30M eligible market
+
+   KEY BOTTLENECK: Warehouse forklifts represent the largest constraint in the
+   mobile ground vehicles category. Only a small fraction of forklifts have
+   telematics systems with integrated camera feeds necessary for GI deployment.
+
+
+1.2 Construction/Agriculture Equipment: 15% ($30M / $200M)
+   • Total install base: 3.5M units (excavators, tractors, loaders)
+     Source: Market Sizing Math.pdf, Construction/Ag Equipment section
+
+   • Visual perception systems: 500K units
+     Calculation: "15% adoption of cameras/sensors for autonomous guidance"
+     Reference: Market Sizing Math.pdf
+
+   • Eligibility rate: 15% (500K / 3.5M)
+   • TAM: $200M × 15% = $30M
+
+
+1.3 Last-Mile Delivery Robots: 80% ($55M / $70M)
+   • Total deployments: 50K robots
+     Source: Market Sizing Math.pdf, Last-Mile Delivery section
+
+   • Visual perception equipped: 40K units
+     Rationale: "Most autonomous delivery robots require camera-based navigation"
+     Reference: Market Sizing Math.pdf
+
+   • Eligibility rate: 80% (40K / 50K)
+   • TAM: $70M × 80% = $55M
+
+
+1.4 Warehouse AMRs: 90% ($80M / $100M)
+   • Total sites using AMRs: 100K warehouse sites
+     Source: "100K+ warehouse sites deploying AMRs" (Interact Analysis)
+     Reference: Market Sizing Math.pdf, Warehouse AMRs section
+
+   • Camera-based AMRs: 90K sites
+     Rationale: "Modern AMRs predominantly use vision-based SLAM navigation"
+     Reference: Market Sizing Math.pdf
+
+   • Eligibility rate: 90%
+   • TAM: $100M × 90% = $80M
+
+
+MOBILE GROUND VEHICLES SUMMARY:
+• Total TAM: $770M
+• Visual Perception Eligible: $195M
+• Overall Category Eligibility: 25%
+
+
+
+2. AERIAL SYSTEMS: ~70% Eligibility ($161.5M / $230M)
+--------------------------------------------------------------------------------
+
+2.1 Infrastructure Inspection Drones: 90% ($90M / $100M)
+   • Total commercial drone fleet: 500K units in inspection use
+     Source: Market Sizing Math.pdf, Aerial Systems section
+
+   • Camera/sensor-equipped: 450K units
+     Rationale: "Infrastructure inspection inherently requires high-resolution
+     cameras and LiDAR for defect detection"
+     Reference: Market Sizing Math.pdf, Infrastructure Inspection subsection
+
+   • Eligibility rate: 90%
+   • TAM: $100M × 90% = $90M
+
+
+2.2 Agricultural Drones: 60% ($54M / $90M)
+   • Total agricultural drone deployments: 800K units
+     Source: Market Sizing Math.pdf, Agricultural Drones section
+
+   • Multispectral/visual imaging: 480K units
+     Calculation: "60% equipped with multispectral or RGB cameras for crop
+     monitoring beyond basic GPS waypoint navigation"
+     Reference: Market Sizing Math.pdf
+
+   • Eligibility rate: 60%
+   • TAM: $90M × 60% = $54M
+
+
+2.3 Warehouse Inventory Drones: 50% ($17.5M / $35M)
+   • Limited deployment: ~25K units across major warehouses
+     Source: Market Sizing Math.pdf, Warehouse Inventory Drones section
+
+   • Vision-based inventory scanning: 12.5K units
+     Calculation: "50% use RFID-only systems without visual confirmation"
+     Reference: Market Sizing Math.pdf
+
+   • Eligibility rate: 50%
+   • TAM: $35M × 50% = $17.5M
+
+
+AERIAL SYSTEMS SUMMARY:
+• Total TAM: $230M
+• Visual Perception Eligible: $161.5M
+• Overall Category Eligibility: 70%
+
+
+
+3. MANIPULATION SYSTEMS: ~90% Eligibility ($325M / $360M)
+--------------------------------------------------------------------------------
+
+3.1 Pick-and-Place Applications: 95% ($190M / $200M)
+   • Total install base: 1.2M industrial robots in pick-and-place
+     Source: "IFR International Federation of Robotics data shows 1.2M units
+     in electronics, logistics, food handling"
+     Reference: Market Sizing Math.pdf, Manipulation Systems section
+
+   • Vision-guided systems: 1.14M units
+     Rationale: "Modern pick-and-place requires 2D/3D vision for object
+     localization and pose estimation, especially for unstructured bins"
+     Reference: GI Enterprise Case Study.pdf, Manipulation section
+
+   • Eligibility rate: 95%
+   • TAM: $200M × 95% = $190M
+
+
+3.2 Assembly & Fabrication: 85% ($85M / $100M)
+   • Total robotic assembly cells: 800K units globally
+     Source: Market Sizing Math.pdf, Assembly & Fabrication section
+
+   • Camera-based quality inspection: 680K units
+     Calculation: "85% incorporate vision systems for part alignment and
+     quality inspection"
+     Reference: Market Sizing Math.pdf
+
+   • Eligibility rate: 85%
+   • TAM: $100M × 85% = $85M
+
+
+3.3 Welding & Material Processing: 85% ($50M / $60M)
+   • Total welding robots: 400K units
+     Source: Market Sizing Math.pdf, Welding section
+
+   • Vision-based seam tracking: 340K units
+     Rationale: "Modern welding robots use vision for adaptive seam tracking
+     and weld quality monitoring"
+     Reference: Market Sizing Math.pdf
+
+   • Eligibility rate: 85%
+   • TAM: $60M × 85% = $50M
+
+
+MANIPULATION SYSTEMS SUMMARY:
+• Total TAM: $360M
+• Visual Perception Eligible: $325M
+• Overall Category Eligibility: 90%
+
+
+
+OVERALL MARKET SUMMARY
+================================================================================
+
+Category                        Total TAM    Eligible Market    Eligibility %
+--------------------------------------------------------------------------------
+Mobile Ground Vehicles          $770M        $195M              25%
+Aerial Systems                  $230M        $161.5M            70%
+Manipulation Systems            $360M        $325M              90%
+--------------------------------------------------------------------------------
+TOTAL                           $1.36B       $681.5M            50%
+
+
+KEY FINDINGS
+================================================================================
+
+1. WAREHOUSE FORKLIFTS ARE THE PRIMARY BOTTLENECK
+   The $400M warehouse forklift market has only 7% eligibility due to low
+   adoption of camera-equipped telematics systems. Of 16M forklifts globally,
+   only 1.1M have video feeds (Berg Insight data).
+
+   Impact: This single subsector reduces overall mobile ground vehicle
+   eligibility from ~50% to 25%.
+
+
+2. MANIPULATION SYSTEMS SHOW HIGHEST VISUAL PERCEPTION ADOPTION
+   90% of the $360M manipulation market is eligible because:
+   - Pick-and-place inherently requires vision for unstructured environments
+   - Assembly tasks need camera-based part alignment and QC
+   - Even welding robots increasingly use vision for seam tracking
+
+   Source: IFR data on industrial robot deployments, referenced in Market
+   Sizing Math.pdf and GI Enterprise Case Study.pdf
+
+
+3. AERIAL SYSTEMS HAVE MODERATE ELIGIBILITY (70%)
+   While drones naturally incorporate cameras, some applications (agricultural
+   spraying, basic GPS waypoint delivery) don't require the visual perception
+   sophistication needed for GI's technology.
+
+   Infrastructure inspection shows highest eligibility at 90% due to inherent
+   need for visual defect detection.
+
+
+4. ELIGIBILITY TRACKS VISUAL/CAMERA SYSTEMS SPECIFICALLY
+   This analysis focuses on robots with:
+   - Camera feeds (RGB, thermal, multispectral)
+   - 3D sensors (LiDAR, structured light, stereo vision)
+   - Video telemetry systems
+
+   Simple encoders, GPS, or RFID-only systems are excluded as they lack the
+   visual perception data GI requires for effective deployment.
+
+
+METHODOLOGY NOTES
+================================================================================
+
+Eligibility rates are based on:
+1. Install base data from Berg Insight (telematics), IFR (industrial robots),
+   Interact Analysis (warehouse automation)
+2. Technology adoption rates for camera/sensor systems
+3. Use case requirements for visual perception (structured vs. unstructured
+   environments)
+
+All calculations are conservative estimates based on current market data as
+of the analysis date. Future adoption of visual perception systems will likely
+increase eligibility rates, particularly in the warehouse forklift segment as
+telematics with cameras becomes more standard.
+
+
+PRIMARY SOURCES
+================================================================================
+
+1. General Intuition _ Enterprise _ Product & Business Case (1).pdf
+   - Market sizing methodology
+   - TAM calculations by category
+
+2. GI _ Enterprise _ Case Study.pdf
+   - Use case requirements
+   - Technology specifications
+
+3. Market Sizing Math.pdf
+   - Install base data (Berg Insight, IFR, Interact Analysis)
+   - Eligibility rate calculations
+   - Warehouse forklift telematics analysis (1.4M with telematics, 1.1M with
+     camera feeds)
+   - AMR deployment statistics (100K warehouse sites)
+   - Industrial robot data (1.2M pick-and-place units)
+
+
+================================================================================
+Analysis Date: January 29, 2026
+Prepared for: General Intuition SimLab
+================================================================================

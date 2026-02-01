@@ -16,7 +16,7 @@ export default function RoboticArmDemoPage() {
         <div className="container mx-auto px-4">
           <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
             <iframe
-              src="/robotic_arm_demo"
+              src="/robotic_arm_demo.html"
               className="w-full h-[900px] border-0"
               title="Robotic Arm Manipulation Demo"
             />
