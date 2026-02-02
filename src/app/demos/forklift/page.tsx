@@ -17,8 +17,9 @@ export default function ForkliftDemoPage() {
           <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
             <iframe
               src="/forklift_demo.html"
-              className="w-full h-[900px] border-0"
+              className="w-full h-[600px] md:h-[900px] border-0"
               title="Forklift Navigation Demo"
+              allow="accelerometer; gyroscope"
             />
           </div>
 
